@@ -11,7 +11,7 @@ class HelpCommand(commands.HelpCommand):
         })
 
     async def send_bot_help(self, mapping):
-        embed = discord.Embed(title='Help', description=f'{self.context.bot.description}\n\nUse `{self.clean_prefix}{self.invoked_with} <category>` for commands in that category.', colour=self.context.bot.color)
+        embed = discord.Embed(title='Help', description=f'{self.context.bot.description}\n\nUse `{self.context.clean_prefix}{self.invoked_with} <category>` for commands in that category.', colour=self.context.bot.color)
         #cogs = []
         for cog, commands in mapping.items():
             if cog is None:
@@ -27,7 +27,7 @@ class HelpCommand(commands.HelpCommand):
         return await self.context.send(embed=embed)
 
     async def send_command_help(self, command):
-        embed = discord.Embed(title=f"{self.clean_prefix}{command.name} | {' | '.join(command.aliases)} {command.signature}" if len(command.aliases) > 0 else f'{self.clean_prefix}{command.name} {command.signature}',
+        embed = discord.Embed(title=f"{self.context.clean_prefix}{command.name} | {' | '.join(command.aliases)} {command.signature}" if len(command.aliases) > 0 else f'{self.context.clean_prefix}{command.name} {command.signature}',
                               description=command.help or "No info available.",
                               colour=self.context.bot.color)
         embed.set_footer(text=self.context.bot.footer)

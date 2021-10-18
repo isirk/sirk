@@ -1,6 +1,104 @@
-import discord, typing, inspect, io, textwrap, traceback
+import discord, typing
 from discord.ext import commands
-from contextlib import redirect_stdout
+
+class TicTacToeButton(discord.ui.Button['TicTacToe']):
+    def __init__(self, x: int, y: int):
+        super().__init__(style=discord.ButtonStyle.secondary, label='\u200b', row=y)
+        self.x = x
+        self.y = y
+
+    async def callback(self, interaction: discord.Interaction):
+        assert self.view is not None
+        view: TicTacToe = self.view
+        state = view.board[self.y][self.x]
+        if state in (view.X, view.O):
+            return
+
+        if view.current_player == view.X:
+            self.style = discord.ButtonStyle.danger
+            self.label = 'X'
+            self.disabled = True
+            view.board[self.y][self.x] = view.X
+            view.current_player = view.O
+            content = "It is now O's turn"
+        else:
+            self.style = discord.ButtonStyle.success
+            self.label = 'O'
+            self.disabled = True
+            view.board[self.y][self.x] = view.O
+            view.current_player = view.X
+            content = "It is now X's turn"
+
+        winner = view.check_board_winner()
+        if winner is not None:
+            if winner == view.X:
+                content = 'X won!'
+            elif winner == view.O:
+                content = 'O won!'
+            else:
+                content = "It's a tie!"
+
+            for child in view.children:
+                assert isinstance(child, discord.ui.Button) # just to shut up the linter
+                child.disabled = True
+
+            view.stop()
+
+        await interaction.response.edit_message(content=content, view=view)
+
+
+class TicTacToe(discord.ui.View):
+    X = -1
+    O = 1
+    Tie = 2
+
+    def __init__(self):
+        super().__init__()
+        self.current_player = self.X
+        self.board = [
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0],
+        ]
+
+        for x in range(3):
+            for y in range(3):
+                self.add_item(TicTacToeButton(x, y))
+
+    def check_board_winner(self):
+        for across in self.board:
+            value = sum(across)
+            if value == 3:
+                return self.O
+            elif value == -3:
+                return self.X
+
+        # Check vertical
+        for line in range(3):
+            value = self.board[0][line] + self.board[1][line] + self.board[2][line]
+            if value == 3:
+                return self.O
+            elif value == -3:
+                return self.X
+
+        # Check diagonals
+        diag = self.board[0][2] + self.board[1][1] + self.board[2][0]
+        if diag == 3:
+            return self.O
+        elif diag == -3:
+            return self.X
+
+        diag = self.board[0][0] + self.board[1][1] + self.board[2][2]
+        if diag == 3:
+            return self.O
+        elif diag == -3:
+            return self.X
+
+        # If we're here, we need to check if a tie was made
+        if all(i != 0 for row in self.board for i in row):
+            return self.Tie
+
+        return None
 
 class commands(commands.Cog):
     '''Commands'''
@@ -17,102 +115,17 @@ class commands(commands.Cog):
         '''Get the id for something'''
         await ctx.send(f"{thing.id}")
 
-    @commands.is_owner()
     @commands.command()
-    async def exit(self, ctx):
-        try:
-            await ctx.message.add_reaction('👋')
-        except:
-            pass
-        await self.bot.close()
-    
-    @commands.is_owner()
-    @commands.command()
-    async def eval(self, ctx, *, body):
-        env = {
-            'ctx': ctx,
-            'bot': self.bot,
-            'channel': ctx.channel,
-            'author': ctx.author,
-            'guild': ctx.guild,
-            'message': ctx.message,
-            'source': inspect.getsource
-        }
+    async def button(self, ctx):
+        view = discord.ui.View()
+        style = discord.ButtonStyle.gray
+        item = discord.ui.Button(style=style, label="Button")
+        view.add_item(item=item)
+        await ctx.send("Button!", view=view)
 
-        def cleanup_code(content):
-            """Automatically removes code blocks from the code."""
-            # remove ```py\n```
-            if content.startswith('```') and content.endswith('```'):
-                return '\n'.join(content.split('\n')[1:-1])
-
-            # remove `foo`
-            return content.strip('` \n')
-
-        env.update(globals())
-
-        body = cleanup_code(body)
-        stdout = io.StringIO()
-        err = out = None
-
-        to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
-
-        def paginate(text: str):
-            '''Simple generator that paginates text.'''
-            last = 0
-            pages = []
-            for curr in range(0, len(text)):
-                if curr % 1980 == 0:
-                    pages.append(text[last:curr])
-                    last = curr
-                    appd_index = curr
-            if appd_index != len(text)-1:
-                pages.append(text[last:curr])
-            return list(filter(lambda a: a != '', pages))
-        
-        try:
-            exec(to_compile, env)
-        except Exception as e:
-            err = await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
-            return await ctx.message.add_reaction('\u2049')
-
-        func = env['func']
-        try:
-            with redirect_stdout(stdout):
-                ret = await func()
-        except Exception as e:
-            value = stdout.getvalue()
-            err = await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
-        else:
-            value = stdout.getvalue()
-            if ret is None:
-                if value:
-                    try:
-                        
-                        out = await ctx.send(f'```py\n{value}\n```')
-                    except:
-                        paginated_text = paginate(value)
-                        for page in paginated_text:
-                            if page == paginated_text[-1]:
-                                out = await ctx.send(f'```py\n{page}\n```')
-                                break
-                            await ctx.send(f'```py\n{page}\n```')
-            else:
-                try:
-                    out = await ctx.send(f'```py\n{value}{ret}\n```')
-                except:
-                    paginated_text = paginate(f"{value}{ret}")
-                    for page in paginated_text:
-                        if page == paginated_text[-1]:
-                            out = await ctx.send(f'```py\n{page}\n```')
-                            break
-                        await ctx.send(f'```py\n{page}\n```')
-
-        if out:
-            await ctx.message.add_reaction('\u2705')  # tick
-        elif err:
-            await ctx.message.add_reaction('\u2049')  # x
-        else:
-            await ctx.message.add_reaction('\u2705')
+    @commands.command(aliases=['tt'])
+    async def tictactoe(self, ctx):
+        await ctx.send("TicTacToe!", view=TicTacToe())
 
 def setup(bot):
     bot.add_cog(commands(bot))
