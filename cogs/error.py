@@ -1,5 +1,4 @@
-import discord, datetime, difflib
-from discord import message
+import discord
 from discord.ext import commands
 
 class error(commands.Cog):

@@ -11,7 +11,7 @@ class HelpCommand(commands.HelpCommand):
         })
 
     async def send_bot_help(self, mapping):
-        embed = discord.Embed(title='Help', description=f'{self.context.bot.description}\n\nUse `{self.context.clean_prefix}{self.invoked_with} <category>` for commands in that category.', colour=self.context.bot.color)
+        embed = discord.Embed(title='Help', description=f'{self.context.bot.description}\n\nUse `{self.context.clean_prefix}{self.invoked_with} <command/module>` for more help.', colour=self.context.bot.color)
         #cogs = []
         for cog, commands in mapping.items():
             if cog is None:

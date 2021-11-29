@@ -123,7 +123,7 @@ class commands(commands.Cog):
         view.add_item(item=item)
         await ctx.send("Button!", view=view)
 
-    @commands.command(aliases=['tt'])
+    @commands.command(aliases=['ttt'])
     async def tictactoe(self, ctx):
         await ctx.send("TicTacToe!", view=TicTacToe())
 

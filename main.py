@@ -1,6 +1,5 @@
 import os
 from utils.bot import Bot
-from discord.ext import commands
 
 bot = Bot()
 
