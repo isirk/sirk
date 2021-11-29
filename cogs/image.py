@@ -407,8 +407,8 @@ class image(commands.Cog):
     async def merge(self, ctx, m1: discord.Member, m2: discord.Member = None):
         '''Merge two avatars together'''
         m2 = m2 or ctx.author
-        url1 = m1.avatar.url_as(size=512, format="png")
-        url2 = m2.avatar.url_as(size=512, format="png")
+        url1 = m1.avatar.replace(size=512, format="png")
+        url2 = m2.avatar.replace(size=512, format="png")
         async with ctx.typing():
             img1 = BytesIO(await url1.read())
             img1.seek(0)
