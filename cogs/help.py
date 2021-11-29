@@ -48,7 +48,6 @@ class HelpCommand(commands.HelpCommand):
             embed.add_field(name="Aliases:", value="\n".join(group.aliases), inline=False)
         embed.set_footer(text=self.context.bot.footer)
         return await self.context.send(embed=embed)
-
     
 def setup(bot):
     bot.help_command = HelpCommand()

@@ -16,7 +16,7 @@ class error(commands.Cog):
                 color = discord.Color.red()
             )
             embed.set_footer(text=self.bot.footer)
-            await ctx.reply(embed=embed)
+            await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(error(bot))
