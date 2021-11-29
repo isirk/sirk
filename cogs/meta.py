@@ -16,14 +16,14 @@ class meta(commands.Cog):
         '''Get the id for something'''
         await ctx.send(f"{thing.id}")
 
-    @commands.command()
-    async def source(self, ctx):
-        '''See the bot's source code'''
-        view = discord.ui.View()
-        style = discord.ButtonStyle.gray
-        item = discord.ui.Button(style=style, label="Source", url="https://youtu.be/dQw4w9WgXcQ")
-        view.add_item(item=item)
-        await ctx.send("Here is my source!", view=view)
+    @commands.command(aliases=['about'])
+    async def info(self, ctx):
+        '''See information about the bot'''
+        embed = discord.Embed(title=self.bot.user.name, description="a bot", color=self.bot.color)
+        embed.add_field(name=f"Stats", value=f"Ping: {round(self.bot.latency * 1000)} ms\nServers: {len(self.bot.guilds)}\nCommands: {len(self.bot.commands)}")
+        embed.set_thumbnail(url=self.bot.user.avatar.url)
+        embed.set_footer(text=self.bot.footer)
+        await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(meta(bot))

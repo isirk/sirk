@@ -12,16 +12,16 @@ class HelpCommand(commands.HelpCommand):
 
     async def send_bot_help(self, mapping):
         embed = discord.Embed(title='Help', description=f'{self.context.bot.description}\n\nUse `{self.context.clean_prefix}{self.invoked_with} <command/module>` for more help.', colour=self.context.bot.color)
-        #cogs = []
+        cogs = []
         for cog, commands in mapping.items():
             if cog is None:
                 pass
             else:
                 filtered = await self.filter_commands(commands, sort=True)
                 if filtered:
-                    embed.add_field(name=cog.qualified_name.capitalize(), value=" ".join(f"`{command}`" for command in await self.filter_commands(cog.get_commands())) or "No commands")
-                    #cogs.append(cog.qualified_name)
-        #embed.add_field(name='Categories', value='\n'.join(cogs))
+                    #embed.add_field(name=cog.qualified_name.capitalize(), value=" ".join(f"`{command}`" for command in await self.filter_commands(cog.get_commands())) or "No commands")
+                    cogs.append(cog.qualified_name)
+        embed.add_field(name='Categories', value='\n'.join(cogs))
         embed.set_footer(text=self.context.bot.footer)
         #embed.set_footer(text='Use {0}{1} [command|module] for more info.'.format(self.clean_prefix, self.invoked_with))#self.get_ending_note())
         return await self.context.send(embed=embed)

@@ -12,7 +12,7 @@ class image(commands.Cog):
         self.invis = 0x2F3136
         
     async def manip(self, ctx, img, func, filename:str, *args, **kwargs):
-        url = img.avatar.replace(size=512, format="png")
+        url = img.display_avatar.replace(size=512, format="png")
         async with ctx.typing():
             img = BytesIO(await url.read())
             img.seek(0)
