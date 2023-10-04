@@ -18,5 +18,5 @@ class error(commands.Cog):
             embed.set_footer(text=self.bot.footer)
             await ctx.send(embed=embed)
 
-def setup(bot):
-    bot.add_cog(error(bot))
+async def setup(bot):
+    await bot.add_cog(error(bot))

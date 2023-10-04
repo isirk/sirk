@@ -49,5 +49,5 @@ class HelpCommand(commands.HelpCommand):
         embed.set_footer(text=self.context.bot.footer)
         return await self.context.send(embed=embed)
     
-def setup(bot):
+async def setup(bot):
     bot.help_command = HelpCommand()

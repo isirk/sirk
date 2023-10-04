@@ -441,5 +441,5 @@ class image(commands.Cog):
         e.set_image(url="attachment://ascii.png")
         await ctx.send(file=file, embed=e)
 
-def setup(bot):
-    bot.add_cog(image(bot))
+async def setup(bot):
+    await bot.add_cog(image(bot))
