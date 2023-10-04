@@ -11,7 +11,6 @@ class error(commands.Cog):
             return
         else:
             embed = discord.Embed(
-                title = "An error occurred!",
                 description = f"```{str(error)}```",
                 color = discord.Color.red()
             )

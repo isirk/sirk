@@ -1,10 +1,10 @@
-import asyncio
+import asyncio, os
 from utils.bot import Bot
 
 bot = Bot()
 
 async def main():
     async with bot:
-        await Bot().start("MTE0NjIxNjc1NTcxOTU4MTcyNg.G85lpK.4DefYimkxgHenc53dbfNRirE5szQjAmGkCzGGc")
+        await bot.start(os.environ.get("DISCORD_TOKEN"))
 
 asyncio.run(main())

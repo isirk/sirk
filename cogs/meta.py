@@ -19,9 +19,9 @@ class meta(commands.Cog):
     @commands.command(aliases=['about'])
     async def info(self, ctx):
         '''See information about the bot'''
-        embed = discord.Embed(title=self.bot.user.name, description="a bot", color=self.bot.color)
-        embed.add_field(name=f"Stats", value=f"Ping: {round(self.bot.latency * 1000)} ms\nServers: {len(self.bot.guilds)}\nCommands: {len(self.bot.commands)}")
-        embed.set_thumbnail(url=self.bot.user.avatar.url)
+        embed = discord.Embed(title=self.bot.user.name, description=self.bot.description, color=self.bot.color)
+        embed.add_field(name=f"Stats", value=f"Ping: `{round(self.bot.latency * 1000)} ms`\nServers: `{len(self.bot.guilds)}`\nCommands: `{len(self.bot.commands)}`")
+        embed.set_thumbnail(url=self.bot.user.display_avatar)
         embed.set_footer(text=self.bot.footer)
         await ctx.send(embed=embed)
 

@@ -42,22 +42,15 @@ class dev(commands.Cog):
     @commands.command(aliases=['ra'])
     async def reloadall(self, ctx):
         """Reloads all extensions. """
-        error_collection = []
-        for file in os.listdir("cogs"):
-            if file.endswith(".py"):
-                name = file[:-3]
+        
+        self.bot.description = (await self.bot.application_info()).description
+
+        for filename in os.listdir('./cogs'):
+            if filename.endswith('.py'):
                 try:
-                    await self.bot.reload_extension(f"cogs.{name}")
+                    await self.bot.reload_extension(f'cogs.{filename[:-3]}')
                 except Exception as e:
-                    return await ctx.send(f"```py\n{e}```")
-
-        if error_collection:
-            output = "\n".join([f"**{g[0]}** ```diff\n- {g[1]}```" for g in error_collection])
-            return await ctx.send(
-                f"Attempted to reload all extensions, was able to reload, "
-                f"however the following failed...\n\n{output}"
-            )
-
+                    await ctx.send(f'Failed to load cog {filename[:-3]}\n{e}')        
         await ctx.message.add_reaction('🔁')
 
     @commands.command()
@@ -67,6 +60,11 @@ class dev(commands.Cog):
         except:
             pass
         await self.bot.close()
+
+    @commands.command()
+    async def cogs(self, ctx):
+        cogs = "\n".join([cog for cog in self.bot.cogs])
+        await ctx.send(embed=discord.Embed(description=f"```{cogs}```", color=self.bot.color))
 
 async def setup(bot):
     await bot.add_cog(dev(bot))
