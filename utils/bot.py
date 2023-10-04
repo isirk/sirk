@@ -16,26 +16,33 @@ class Bot(commands.Bot):
         self.uptime = datetime.datetime.utcnow()
         self.footer = "v0.1.1"
         self.color = 0x7289DA
-        self.owner = None
 
-    async def send_log(self, message):
-        if self.owner is not None:
-            await self.owner.send(":gear: | " + message)
+    async def send_log(self, type, message):
+        channel = await self.fetch_channel(1159267547582042202)
+        time = datetime.datetime.utcnow().strftime("%H:%M:%S")
+        if type == "e":
+            type = ":exclamation: "
+        elif type == "s":
+            type = ":gear: "
+        elif type == "c":
+            type = ":white_check_mark: "
+        elif type == "x":
+            type = ":x: "
+        await channel.send(f"{time} | " + type + message)
 
     async def on_ready(self):
-        await self.send_log(f"Logged in as {self.user}")
+        await self.send_log("c", f"Connected")
 
     async def setup_hook(self):
-        self.owner = await self.fetch_user(self.owner_id)
         self.description = (await self.application_info()).description
 
         for filename in os.listdir('./cogs'):
             if filename.endswith('.py'):
                 try:
                     await self.load_extension(f'cogs.{filename[:-3]}')
+                    await self.send_log("s", f'Loaded `{filename[:-3]}`')
                 except Exception as e:
-                    await self.send_log(f'Failed to load cog {filename[:-3]}\n{e}')
-        await self.send_log('Loaded Cogs')
+                    await self.send_log("e", f'Failed to load cog {filename[:-3]}\n```{e}```')
 
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
         if before.content == after.content:

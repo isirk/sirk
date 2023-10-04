@@ -55,16 +55,12 @@ class dev(commands.Cog):
 
     @commands.command()
     async def exit(self, ctx):
-        try:
-            await ctx.message.add_reaction('👋')
-        except:
-            pass
+        await self.bot.send_log("x", "Exited")
         await self.bot.close()
 
     @commands.command()
     async def cogs(self, ctx):
-        cogs = "\n".join([cog for cog in self.bot.cogs])
-        await ctx.send(embed=discord.Embed(description=f"```{cogs}```", color=self.bot.color))
+        await ctx.send(", ".join([cog for cog in self.bot.cogs]))
 
 async def setup(bot):
     await bot.add_cog(dev(bot))
